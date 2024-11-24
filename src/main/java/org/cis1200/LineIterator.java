@@ -3,6 +3,7 @@ package org.cis1200;
 import java.io.IOException;
 import java.util.Iterator;
 import java.io.BufferedReader;
+import java.util.NoSuchElementException;
 
 /**
  * {@code LineIterator} provides a useful wrapper around Java's provided
@@ -16,12 +17,13 @@ import java.io.BufferedReader;
  *
  * - Do not use the {@code ready()} method from {@code BufferedReader}.
  */
+
 public class LineIterator implements Iterator<String> {
 
     // TODO: Add the fields needed to implement your LineIterator
     private BufferedReader reader;
-    private String nextLine;
     private boolean hasNext;
+    private String nextLine;
 
     /**
      * Constructs a {@code LineIterator} for reader. Feel free to create and
@@ -37,15 +39,16 @@ public class LineIterator implements Iterator<String> {
      * @param reader - A reader to be turned to an Iterator
      * @throws IllegalArgumentException if reader is null
      */
+
     public LineIterator(BufferedReader reader) {
         // TODO: Complete this constructor.
         if (reader == null) {
             throw new IllegalArgumentException("reader is null");
         }
-        this.reader = reader;
         try {
-            this.nextLine = reader.readLine();
-            this.hasNext = (this.nextLine != null);
+            this.reader = reader;
+            this.hasNext = this.reader.readLine() != null;
+            this.nextLine = this.reader.readLine();
         }
         catch (IOException e) {
             this.hasNext = false;
@@ -80,7 +83,17 @@ public class LineIterator implements Iterator<String> {
      */
     @Override
     public boolean hasNext() {
-        return false; // TODO: Complete this method.
+        // TODO: Complete this method.
+        if (hasNext) {
+            return true;
+        }
+        try {
+            reader.close();
+        }
+        catch (IOException e) {
+            System.err.println("Error closing reader: " + e.getMessage());
+        }
+        return false;
     }
 
     /**
@@ -99,7 +112,23 @@ public class LineIterator implements Iterator<String> {
      */
     @Override
     public String next() {
-        return null; // TODO: Complete this method.
-
+        // TODO: Complete this method.
+        if (!hasNext()) {
+            throw new NoSuchElementException();
+        }
+        String currentLine = nextLine;
+        try {
+            nextLine = reader.readLine();
+            if (nextLine == null) {
+                hasNext = false;
+                reader.close();
+            }
+        }
+        catch (IOException e) {
+            hasNext = false;
+            nextLine = null;
+            System.err.println("Error closing reader: " + e.getMessage());
+        }
+        return currentLine;
     }
 }
