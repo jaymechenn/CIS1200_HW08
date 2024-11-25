@@ -55,6 +55,8 @@ class MarkovChainIterator implements Iterator<String> {
     private final NumberGenerator ng;
 
     // TODO: add field(s) used in implementing the Iterator functionality
+    private String currentToken;
+    private boolean done;
 
     /**
      * Constructs an iterator that follows the path specified by the given
@@ -81,6 +83,13 @@ class MarkovChainIterator implements Iterator<String> {
         this.bigramFrequencies = bigramFrequencies;
         this.ng = ng;
         // TODO: complete this constructor
+        try {
+            this.currentToken = startTokens.pick(ng);
+            this.done = false;
+        } catch (Exception e) {
+            this.currentToken = MarkovChain.END_TOKEN;
+            this.done = true;
+        }
     }
 
     /**
@@ -95,7 +104,8 @@ class MarkovChainIterator implements Iterator<String> {
      */
     @Override
     public boolean hasNext() {
-        return false; // TODO: Complete this method.
+        // TODO: Complete this method.
+        return !currentToken.equals(MarkovChain.END_TOKEN);
     }
 
     /**
@@ -109,7 +119,27 @@ class MarkovChainIterator implements Iterator<String> {
      */
     @Override
     public String next() {
-        return null; // TODO: Complete this method.
+        // TODO: Complete this method.
+        if (!hasNext()) {
+            throw new NoSuchElementException("No more tokens.");
+        }
+        String result = currentToken;
+        try {
+            if (currentToken.equals(MarkovChain.END_TOKEN)) {
+                done = true;
+            } else {
+                ProbabilityDistribution<String> frequency = bigramFrequencies.get(currentToken);
+                if (frequency != null) {
+                    currentToken = frequency.pick(ng);
+                } else {
+                    currentToken = MarkovChain.END_TOKEN;
+                }
+            }
+        } catch (Exception e) {
+            currentToken = MarkovChain.END_TOKEN;
+            done = true;
+        }
+        return result;
     }
 
 }
