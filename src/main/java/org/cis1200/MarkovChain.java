@@ -164,8 +164,15 @@ public class MarkovChain {
         if (first == null || second == null) {
             throw new IllegalArgumentException("Neither token can be null");
         }
-        ProbabilityDistribution<String> distribution = bigramFrequencies.computeIfAbsent(
-                first, k -> new ProbabilityDistribution<>());
+        //ProbabilityDistribution<String> distribution = bigramFrequencies.computeIfAbsent(
+                //first, k -> new ProbabilityDistribution<>());
+        ProbabilityDistribution distribution;
+        if (bigramFrequencies.containsKey(first)) {
+            distribution = bigramFrequencies.get(first);
+        } else {
+            distribution = new ProbabilityDistribution();
+            bigramFrequencies.put(first, distribution);
+        }
         distribution.record(second);
     }
 
