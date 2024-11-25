@@ -183,6 +183,98 @@ public class MarkovChainTest {
 
     }
 
+    @Test
+    public void testAddBigramMultiple() {
+        MarkovChain mc = new MarkovChain();
+        mc.addBigram("a", "b");
+        mc.addBigram("a", "c");
+        mc.addBigram("a", "b");
 
+        ProbabilityDistribution<String> pd = mc.bigramFrequencies.get("a");
+        assertEquals(2, pd.count("b"));
+        assertEquals(1, pd.count("c"));
+        assertEquals(2, pd.getTotal());
+    }
+
+    @Test
+    public void testAddEmptySequence() {
+        MarkovChain mc = new MarkovChain();
+        mc.addSequence(Collections.emptyIterator());
+        assertEquals(0, mc.startTokens.getRecords().size());
+        assertEquals(0, mc.bigramFrequencies.size());
+    }
+
+    @Test
+    public void testMultipleStartTokens() {
+        MarkovChain mc = new MarkovChain();
+        mc.addSequence(Arrays.asList("a", "b").iterator());
+        mc.addSequence(Arrays.asList("c", "d").iterator());
+        assertEquals(2, mc.startTokens.getRecords().size());
+        assertEquals(1, mc.startTokens.count("a"));
+        assertEquals(1, mc.startTokens.count("c"));
+    }
+
+    @Test
+    public void testFindWalkChoicesInvalid() {
+        MarkovChain mc = new MarkovChain();
+        mc.addSequence(Arrays.asList("a", "b", "c").iterator());
+        List<String> invalidTokens = Arrays.asList("x", "y");
+        assertThrows(IllegalArgumentException.class, () -> mc.findWalkChoices(invalidTokens));
+    }
+
+    @Test
+    public void testWalkWithRepeatedTokens() {
+        MarkovChain mc = new MarkovChain();
+        mc.addSequence(Arrays.asList("a", "b", "a", "b").iterator());
+        List<Integer> choices = Arrays.asList(0, 0, 0, 1);
+        Iterator<String> walk = mc.getWalk(new ListNumberGenerator(choices));
+        String[] expectedTokens = { "a", "b", "a", "b" };
+        for (String token : expectedTokens) {
+            assertTrue(walk.hasNext());
+            assertEquals(token, walk.next());
+        }
+        assertFalse(walk.hasNext());
+    }
+
+    @Test
+    public void testLargeDataset() {
+        MarkovChain mc = new MarkovChain();
+        for (int i = 0; i < 1000; i++) {
+            mc.addSequence(Arrays.asList("token" + i, "token" + (i + 1)).iterator());
+        }
+        assertEquals(1000, mc.bigramFrequencies.size());
+        ProbabilityDistribution<String> pd = mc.bigramFrequencies.get("token500");
+        assertNotNull(pd);
+        assertEquals(1, pd.count("token501"));
+    }
+
+    @Test
+    public void testWalkEarlyTermination() {
+        MarkovChain mc = new MarkovChain();
+        mc.addSequence(Arrays.asList("start", "middle", "end").iterator());
+        List<Integer> choices = Arrays.asList(0, 0);
+        Iterator<String> walk = mc.getWalk(new ListNumberGenerator(choices));
+        String[] expectedTokens = { "start", "middle" };
+        for (String token : expectedTokens) {
+            assertTrue(walk.hasNext());
+            assertEquals(token, walk.next());
+        }
+        assertFalse(walk.hasNext());
+    }
+
+    @Test
+    public void testWalkWithMultiplePaths() {
+        MarkovChain mc = new MarkovChain();
+        mc.addSequence(Arrays.asList("a", "b", "c").iterator());
+        mc.addSequence(Arrays.asList("a", "d", "e").iterator());
+        List<Integer> choices = Arrays.asList(0, 1, 0);
+        Iterator<String> walk = mc.getWalk(new ListNumberGenerator(choices));
+        String[] expectedTokens = { "a", "d", "e" };
+        for (String token : expectedTokens) {
+            assertTrue(walk.hasNext());
+            assertEquals(token, walk.next());
+        }
+        assertFalse(walk.hasNext());
+    }
 
 }
