@@ -142,6 +142,9 @@ public class MarkovChain {
         this.bigramFrequencies = new TreeMap<>();
         this.startTokens = new ProbabilityDistribution<>();
         // TODO: complete this constructor
+        for (List<String> sequence : trainingData) {
+            addSequence(sequence.iterator());
+        }
     }
 
     /**
@@ -158,7 +161,12 @@ public class MarkovChain {
      */
     void addBigram(String first, String second) {
         // TODO: Complete this method.
-
+        if (first == null || second == null) {
+            throw new IllegalArgumentException("Neither token can be null");
+        }
+        ProbabilityDistribution<String> distribution = bigramFrequencies.computeIfAbsent(
+                first, k -> new ProbabilityDistribution<>());
+        distribution.record(second);
     }
 
     /**
@@ -182,6 +190,20 @@ public class MarkovChain {
      */
     public void addSequence(Iterator<String> tweet) {
         // TODO: Complete this method.
+        if (tweet == null) {
+            throw new IllegalArgumentException("Tweet iterator is null");
+        }
+        if (!tweet.hasNext()) {
+            return;
+        }
+        String token = tweet.next();
+        startTokens.record(token);
+        while (tweet.hasNext()) {
+            String nextToken = tweet.next();
+            addBigram(token, nextToken);
+            token = nextToken;
+        }
+        addBigram(token, END_TOKEN);
     }
 
     /**
