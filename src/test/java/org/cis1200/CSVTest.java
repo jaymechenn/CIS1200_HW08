@@ -98,7 +98,7 @@ public class CSVTest {
         String csvLine = ",,\"\",";
         String[] expected = { "", "", "", "" };
         List<String> results = CSV.parseRecord(csvLine);
-        assertEquals(4, results.size());
+        //assertEquals(4, results.size());
         assertEquals(listOfArray(expected), results);
     }
 

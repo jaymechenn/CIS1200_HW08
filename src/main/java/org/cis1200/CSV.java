@@ -1,6 +1,9 @@
 package org.cis1200;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -121,7 +124,37 @@ public class CSV {
      *         {@code String}s.
      */
     public static List<String> parseRecord(String csvLine) {
-        return null; // TODO: Complete this method.
+        // TODO: Complete this method.
+        if (csvLine == null) {
+            throw new IllegalArgumentException("CSV line cannot be null");
+        }
+        List<String> lines = new ArrayList<>();
+        StringBuilder currentLine = new StringBuilder();
+        boolean quotationMode = false;
+        boolean prevCharWasQuote = false;
+
+        for (char c : csvLine.toCharArray()) {
+            if (c == DOUBLE_QUOTES) {
+                if (quotationMode && prevCharWasQuote) {
+                    currentLine.append(DOUBLE_QUOTES);
+                    prevCharWasQuote = false;
+                }
+                else {
+                    quotationMode = !quotationMode;
+                    prevCharWasQuote = quotationMode;
+                }
+            }
+            else if (c == COMMA && !quotationMode) {
+                lines.add(currentLine.toString());
+                currentLine = new StringBuilder();
+            }
+            else {
+                currentLine.append(c);
+                prevCharWasQuote = false;
+            }
+        }
+        lines.add(currentLine.toString());
+        return lines;
     }
 
     /**
@@ -138,7 +171,18 @@ public class CSV {
      *                                   valid field index of the record
      */
     static String extractColumn(String csvLine, int csvColumn) {
-        return null; // TODO: Complete this method.
+        // TODO: Complete this method.
+        if (csvLine == null || csvLine.isEmpty()) {
+            throw new IllegalArgumentException("CSV line cannot be empty");
+        }
+        List<String> strings = parseRecord(csvLine);
+        if (csvColumn < 0 || csvColumn >= strings.size()) {
+            throw new IndexOutOfBoundsException("CSV column out of bounds");
+        }
+        if (strings.get(csvColumn) == null) {
+            throw new IllegalArgumentException("CSV column is null");
+        }
+        return strings.get(csvColumn);
     }
 
     /**
@@ -157,7 +201,25 @@ public class CSV {
      * @return a {@code List} of CSV fields (none of which is null)
      */
     static List<String> csvFieldsAtColumn(BufferedReader br, int csvColumn) {
-        return null; // TODO: Complete this method.
+        // TODO: Complete this method.
+        if (br == null) {
+            throw new IllegalArgumentException("BufferedReader cannot be null");
+        }
+        List<String> lines = new ArrayList<>();
+        String currentLine;
+        try {
+            while ((currentLine = br.readLine()) != null) {
+                try {
+                    lines.add(extractColumn(currentLine, csvColumn));
+                }
+                catch (IndexOutOfBoundsException e) {
+                }
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException("Error reading CSV line", e);
+        }
+        return lines;
     }
 
 }
