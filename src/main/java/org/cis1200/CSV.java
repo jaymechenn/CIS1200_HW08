@@ -131,18 +131,10 @@ public class CSV {
         List<String> lines = new ArrayList<>();
         StringBuilder currentLine = new StringBuilder();
         boolean quotationMode = false;
-        boolean prevCharWasQuote = false;
 
         for (char c : csvLine.toCharArray()) {
             if (c == DOUBLE_QUOTES) {
-                if (quotationMode && prevCharWasQuote) {
-                    currentLine.append(DOUBLE_QUOTES);
-                    prevCharWasQuote = false;
-                }
-                else {
-                    quotationMode = !quotationMode;
-                    prevCharWasQuote = quotationMode;
-                }
+                quotationMode = !quotationMode;
             }
             else if (c == COMMA && !quotationMode) {
                 lines.add(currentLine.toString());
@@ -150,7 +142,6 @@ public class CSV {
             }
             else {
                 currentLine.append(c);
-                prevCharWasQuote = false;
             }
         }
         lines.add(currentLine.toString());
