@@ -22,7 +22,6 @@ public class LineIterator implements Iterator<String> {
 
     // TODO: Add the fields needed to implement your LineIterator
     private BufferedReader reader;
-    private boolean hasNext;
     private String nextLine;
 
     /**
@@ -45,13 +44,11 @@ public class LineIterator implements Iterator<String> {
         if (reader == null) {
             throw new IllegalArgumentException("reader is null");
         }
+        this.reader = reader;
         try {
-            this.reader = reader;
-            this.hasNext = this.reader.readLine() != null;
-            this.nextLine = this.reader.readLine();
+            this.nextLine = reader.readLine();
         }
         catch (IOException e) {
-            this.hasNext = false;
             this.nextLine = null;
         }
     }
@@ -84,16 +81,17 @@ public class LineIterator implements Iterator<String> {
     @Override
     public boolean hasNext() {
         // TODO: Complete this method.
-        if (hasNext) {
-            return true;
+        if (nextLine == null) {
+            try {
+                reader.close();
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+                System.out.println("IOException caught");
+            }
+            return false;
         }
-        try {
-            reader.close();
-        }
-        catch (IOException e) {
-            System.err.println("Error closing reader: " + e.getMessage());
-        }
-        return false;
+        return true;
     }
 
     /**
@@ -116,19 +114,13 @@ public class LineIterator implements Iterator<String> {
         if (!hasNext()) {
             throw new NoSuchElementException();
         }
-        String currentLine = nextLine;
+        String result = nextLine;
         try {
-            nextLine = reader.readLine();
-            if (nextLine == null) {
-                hasNext = false;
-                reader.close();
-            }
+            this.nextLine = reader.readLine();
         }
         catch (IOException e) {
-            hasNext = false;
-            nextLine = null;
-            System.err.println("Error closing reader: " + e.getMessage());
+            this.nextLine = null;
         }
-        return currentLine;
+        return result;
     }
 }

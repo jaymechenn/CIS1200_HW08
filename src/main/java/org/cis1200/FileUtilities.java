@@ -20,7 +20,18 @@ public class FileUtilities {
      *                                  doesn't exist
      */
     public static BufferedReader fileToReader(String filePath) {
-        return null; // TODO: Complete this method.
+        // TODO: Complete this method.
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("File path cannot be null");
+        }
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
+            return reader;
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("File not found: " + filePath);
+        }
     }
 
     /**
@@ -46,10 +57,24 @@ public class FileUtilities {
      */
     public static void writeStringsToFile(
             List<String> stringsToWrite, String filePath,
-            boolean append
-    ) {
+            boolean append) {
         BufferedWriter bw;
         // TODO: Complete this method.
+        if (filePath == null || filePath.isEmpty()) {
+            throw new IllegalArgumentException("File path cannot be null");
+        }
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, append));
+            for (String s : stringsToWrite) {
+                writer.write(s);
+                writer.newLine();
+            }
+            writer.flush();
+            writer.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("Error writing to file: " + filePath);
+        }
     }
-
 }
