@@ -162,15 +162,20 @@ public class MarkovChain {
     void addBigram(String first, String second) {
         // TODO: Complete this method.
         if (first == null || second == null) {
-            throw new IllegalArgumentException("Neither token can be null");
+            throw new IllegalArgumentException("Neither token can be null.");
         }
         //ProbabilityDistribution<String> distribution = bigramFrequencies.computeIfAbsent(
                 //first, k -> new ProbabilityDistribution<>());
-        ProbabilityDistribution distribution;
-        if (bigramFrequencies.containsKey(first)) {
-            distribution = bigramFrequencies.get(first);
-        } else {
-            distribution = new ProbabilityDistribution();
+//        ProbabilityDistribution distribution;
+//        if (bigramFrequencies.containsKey(first)) {
+//            distribution = bigramFrequencies.get(first);
+//        } else {
+//            distribution = new ProbabilityDistribution();
+//            bigramFrequencies.put(first, distribution);
+//        }
+        ProbabilityDistribution<String> distribution = bigramFrequencies.get(first);
+        if (distribution == null) {
+            distribution = new ProbabilityDistribution<>();
             bigramFrequencies.put(first, distribution);
         }
         distribution.record(second);

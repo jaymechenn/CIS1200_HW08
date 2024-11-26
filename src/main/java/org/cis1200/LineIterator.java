@@ -81,6 +81,7 @@ public class LineIterator implements Iterator<String> {
     @Override
     public boolean hasNext() {
         // TODO: Complete this method.
+        System.out.println(nextLine);
         if (nextLine == null) {
             try {
                 reader.close();

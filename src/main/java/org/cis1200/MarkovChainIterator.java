@@ -11,7 +11,7 @@ import java.util.*;
  * probability distributions.
  * <p>
  * For example, given
- * 
+ *
  * <pre>
  *  ILLUSTRATIVE EXAMPLE MARKOV CHAIN:
  *  startTokens: { "a":2 }
@@ -24,7 +24,7 @@ import java.util.*;
  *  "chair":    { "&lt;END&gt;":1 }
  *  "table":    { "and":1 }
  * </pre>
- * 
+ *
  * The sequence of numbers 0 2 0 determines the (valid) walk consisting of the
  * three tokens
  * "a", "chair", and {@code END_TOKEN} as follows:
@@ -105,7 +105,10 @@ class MarkovChainIterator implements Iterator<String> {
     @Override
     public boolean hasNext() {
         // TODO: Complete this method.
-        return !currentToken.equals(MarkovChain.END_TOKEN);
+//        System.out.println("Current token: " + currentToken);
+//        System.out.println("Done flag: " + done);
+
+        return !done && !currentToken.equals(MarkovChain.END_TOKEN);
     }
 
     /**
@@ -121,25 +124,31 @@ class MarkovChainIterator implements Iterator<String> {
     public String next() {
         // TODO: Complete this method.
         if (!hasNext()) {
+            done = true;
             throw new NoSuchElementException("No more tokens.");
         }
         String result = currentToken;
         try {
-            if (currentToken.equals(MarkovChain.END_TOKEN)) {
+            ProbabilityDistribution<String> frequency = bigramFrequencies.get(currentToken);
+            if (frequency == null) {
+                currentToken = MarkovChain.END_TOKEN;
                 done = true;
             } else {
-                ProbabilityDistribution<String> frequency = bigramFrequencies.get(currentToken);
-                if (frequency != null) {
-                    currentToken = frequency.pick(ng);
-                } else {
-                    currentToken = MarkovChain.END_TOKEN;
+                currentToken = frequency.pick(ng);
+                if (currentToken.equals(MarkovChain.END_TOKEN)) {
+                    done = true;
                 }
             }
         } catch (Exception e) {
             currentToken = MarkovChain.END_TOKEN;
             done = true;
         }
+//        System.out.println("Current token: " + currentToken);
+//        System.out.println("Done flag: " + done);
+//        System.out.println("hasNext: " + hasNext());
+
         return result;
     }
+
 
 }

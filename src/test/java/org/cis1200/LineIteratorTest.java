@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import java.io.StringReader;
 import java.io.BufferedReader;
 import java.util.NoSuchElementException;
+import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -107,5 +108,4 @@ public class LineIteratorTest {
         assertEquals("Line 2.", li.next());
         assertFalse(li.hasNext());
     }
-
 }

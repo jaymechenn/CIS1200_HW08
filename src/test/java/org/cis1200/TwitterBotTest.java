@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -69,5 +70,83 @@ public class TwitterBotTest {
      * Add additional test cases here, modeled after the generatorWorks test shown
      * above.
      */
+
+    @Test
+    public void testGeneratorWithSimpleData() {
+        String[] tweet = { "hello", "world" };
+        List<List<String>> trainingData = new LinkedList<>();
+        trainingData.add(listOfArray(tweet));
+
+        TwitterBot tb = new TwitterBot(trainingData);
+
+        String expected = "hello world";
+        int[] walk = { 0, 0 };
+        NumberGenerator ng = new ListNumberGenerator(walk);
+        assertEquals(expected, tb.generateTweet(ng));
+    }
+
+    @Test
+    public void testGeneratorWithPunctuation() {
+        String[] tweet = { "hello", "world", "!" };
+        List<List<String>> trainingData = new LinkedList<>();
+        trainingData.add(listOfArray(tweet));
+
+        TwitterBot tb = new TwitterBot(trainingData);
+
+        String expected = "hello world!";
+        int[] walk = { 0, 0, 0 };
+        NumberGenerator ng = new ListNumberGenerator(walk);
+        assertEquals(expected, tb.generateTweet(ng));
+    }
+
+    @Test
+    public void testGeneratorHandlesRepeats() {
+        String[] tweet = { "repeat", "this", "repeat", "this" };
+        List<List<String>> trainingData = new LinkedList<>();
+        trainingData.add(listOfArray(tweet));
+
+        TwitterBot tb = new TwitterBot(trainingData);
+
+        String expected = "repeat this repeat this";
+        int[] walk = { 0, 0, 1, 0 };
+        NumberGenerator ng = new ListNumberGenerator(walk);
+        assertEquals(expected, tb.generateTweet(ng));
+    }
+
+    @Test
+    public void testGeneratorHandlesMultipleTweets() {
+        String[] tweet1 = { "good", "morning" };
+        String[] tweet2 = { "good", "night" };
+        List<List<String>> trainingData = new LinkedList<>();
+        trainingData.add(listOfArray(tweet1));
+        trainingData.add(listOfArray(tweet2));
+
+        TwitterBot tb = new TwitterBot(trainingData);
+
+        String expected = "good morning";
+        int[] walk = { 0, 0 };
+        NumberGenerator ng = new ListNumberGenerator(walk);
+        assertEquals(expected, tb.generateTweet(ng));
+
+        expected = "good night";
+        walk = new int[] { 0, 1 };
+        ng = new ListNumberGenerator(walk);
+        assertEquals(expected, tb.generateTweet(ng));
+    }
+
+    @Test
+    public void testGeneratorLongTweet() {
+        String[] tweet = { "a", "very", "long", "tweet", "to", "generate", "properly" };
+        List<List<String>> trainingData = new LinkedList<>();
+        trainingData.add(listOfArray(tweet));
+
+        TwitterBot tb = new TwitterBot(trainingData);
+
+        String expected = "a very long tweet to generate properly";
+        int[] walk = { 0, 0, 0, 0, 0, 0, 0 };
+        NumberGenerator ng = new ListNumberGenerator(walk);
+        assertEquals(expected, tb.generateTweet(ng));
+    }
+
 
 }

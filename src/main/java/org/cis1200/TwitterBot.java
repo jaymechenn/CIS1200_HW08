@@ -28,11 +28,11 @@ public class TwitterBot {
      * <p>
      * For example, a walk through the MarkovChain of the illustrative example
      * (see {@link MarkovChain}) might produce the following sequence of tokens:
-     * 
+     *
      * <pre>
      *     "a" "banana" "!" "and" "a" "chair"
      * </pre>
-     * 
+     *
      * They would be concatenated with spaces (except before the "!" and at the end)
      * to
      * produce the tweet: {@code "a banana! and a chair"}.
@@ -51,9 +51,15 @@ public class TwitterBot {
         // TODO: Complete this method
         StringBuilder tweet = new StringBuilder();
         Iterator<String> walk = mc.getWalk(ng);
+//        System.out.println(mc);
+        if (walk == null || !walk.hasNext()) {
+            return tweet.toString();
+        }
         String previous = null;
         while (walk.hasNext()) {
             String word = walk.next();
+            System.out.println(word);
+            System.out.println(walk.hasNext());
             if (previous != null && !word.matches(TweetParser.PUNCTUATION_TOKEN)) {
                 tweet.append(" ");
             }
@@ -65,7 +71,7 @@ public class TwitterBot {
 
     /**
      * Generates a random tweet. This function is implemented for you.
-     * 
+     *
      * @return a randomly generated tweet
      */
     public String generateTweet() {
